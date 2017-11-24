@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Magentomobileshop_Connector::advanced"
+        	 title="Magento Mobile Sop"
+        	 module="Magentomobileshop_Connector"
+        	 sortOrder="10" 
+        	 resource="Magentomobileshop_Connector::advanced"
+		/>
+        
+		<add id="Magentomobileshop_Connector::advanced_connector"
+			 title="Configuration" 
+			 module="Magentomobileshop_Connector" 
+			 sortOrder="11"  
+			 parent="Magentomobileshop_Connector::advanced" 
+			 resource="Magentomobileshop_Connector::advanced_connector"
+		/>
+
+		<add id="Magentomobileshop_Connector::connector_configuration" 
+			 title="Manage Configuration" 
+			 module="Magentomobileshop_Connector" 
+			 sortOrder="12"  
+			 parent="Magentomobileshop_Connector::advanced_connector" 
+			 action="adminhtml/system_config/edit/section/configuration"	
+			 resource="Magentomobileshop_Connector::connector_configuration"
+		/>
+
+		<add id="Magentomobileshop_Connector::second_level_example" 
+			 title="Manage Banner" 
+			 module="Magentomobileshop_Connector" 
+			 sortOrder="13"  
+			 resource="Magento_Backend::content"
+			 
+			 parent="Magentomobileshop_Connector::advanced_connector" 
+			 action="grid/grid"
+	
+
+		/>
+
+		
+<!--  		 <add id="Magentomobileshop_Connector::connector_banner" title="Manage Banner" module="Magentomobileshop_Connector" sortOrder="13"  parent="Magentomobileshop_Connector::advanced_connector" 
+ 				action="adminhtml/system_config/edit/section/configuration"	resource="Magentomobileshop_Connector::connector_banner"/> -->
+ 		 
+ 		<!--		<add id="Magentomobileshop_Connector::connector_notification" title="Push Notification" module="Magentomobileshop_Connector" sortOrder="14"  parent="Magentomobileshop_Connector::advanced_connector" 
+ 				action="magentomobileshop_connector/notification"	resource="Magentomobileshop_Connector::connector_notification"/>
+ 			 
+ 		        <add id="Magentomobileshop_Connector::connector_support" title="Connector Support" module="Magentomobileshop_Connector" sortOrder="15"  parent="Magentomobileshop_Connector::advanced_connector" 
+ 				action="magentomobileshop_connector/support"	resource="Magentomobileshop_Connector::connector_support"/> -->
+
+    </menu>
+</config>
+

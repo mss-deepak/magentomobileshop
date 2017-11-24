@@ -1,0 +1,144 @@
+<?php
+namespace Magentomobileshop\Connector\Controller\cart;
+ 
+//use Magento\Checkout\Model\Session;
+
+class getMinimumorder extends \Magento\Framework\App\Action\Action
+{
+
+        /**
+         * @var Session
+         */
+       // protected $checkoutSession;
+	   /**
+          * @var \Magento\Checkout\Model\Cart
+          */
+         protected $checkoutCart;
+         /**
+          * @var \Magento\Catalog\Model\Product
+          */
+         protected $product;
+
+         public function __construct(
+                \Magento\Framework\App\Action\Context $context,
+                \Magento\Framework\Message\ManagerInterface $messageManager,
+                \Magento\Checkout\Model\Cart $checkoutCart,
+               // Session $checkoutSession,
+                \Magento\Catalog\Model\Product $productModel,
+                \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+                \Magento\Checkout\Helper\Cart  $checkoutHelper
+             
+         ) {
+            $this->checkoutCart = $checkoutCart;
+            $this->messageManager = $messageManager;
+            $this->checkoutHelper = $checkoutHelper;
+            $this->productModel = $productModel;
+            $this->scopeConfig = $scopeConfig;
+            parent::__construct($context);
+         }
+    public function execute()
+    {
+        $data = $this->getRequest()->getParams();
+  
+    $cart_data = json_decode($data['cart_data'],1);
+    foreach ($cart_data['items'] as $key => $value) {
+
+      if($value['custom_image_name']) {  
+        $datas = base64_decode($value['custom_image']);
+          file_put_contents(Mage::getBaseDir().'/tmp/'.$cart_data['custom_image_name'], $datas);
+
+              $_FILES['options_'.$value['attribute_id'].'_file'] = array ( 'name' => $value['custom_image_name'], 'type' => "image/jpeg" ,"tmp_name" =>  Mage::getBaseDir().'/tmp/'.$value['custom_image_name'] ,"error" => 0 ,"size" => getimagesize(Mage::getBaseDir().'/tmp/'.$value['custom_image_name']),'app'=>true );
+          $value['options_'.$value['attribute_id'].'_file_action'] = 'save_new';
+          $value['uenc']='aHR0cDovL21hc3RlcnNvZnR3YXJldGVjaG5vbG9naWVzLmNvbS9tbXNfZGV2ZWxvcG1lbnQvZGVmYXVsdC90ZXN0LXByb2R1Y3QuaHRtbA';
+      }
+    }
+    
+        $session = $this->checkoutSession;
+        $session->getQuote()->delete();
+        $session->clear();
+        $cart = $this->checkoutCart;
+        $cart->setQuote($session->getQuote());
+        
+    $array_product = array();
+      
+    foreach($cart_data['items'] as $params):
+      try {
+      $searchs =  array('"{','}"');
+      $replaces = array('{','}');
+      $subjects = ($params['options']);
+
+      $search =  array('"{','}"');
+      $replace = array('{','}');
+      $subject = ($params['super_attribute']);
+
+      $params['super_attribute'] =  json_decode(str_replace($search, $replace, $subject),true);
+      $params['options'] =  json_decode(str_replace($searchs, $replaces, $subjects),true);
+      $product = $this->productModel->load ($params['product']);
+
+        if ($product->getData('has_options')):
+          # validate options
+          $options=$params['options'];    
+          if(count($options)>0):
+              $params['options']=$options;
+          endif;
+        endif;
+        if (isset ($params ['super_attribute'] ) || isset($params['options'])) :
+        
+          if(isset($params['options'])):    
+          $data = array("product"=>$params['product'],"options"=>$params['options'],"super_attribute"=>$params['super_attribute'],
+            'qty' => $params['qty'] 
+            );
+          else:
+            $data = array("product"=>$params ['product'],"super_attribute"=>$params['super_attribute'],
+              'qty' => $params['qty'] 
+            );
+          endif;  
+          $cart->addProduct ( $product, $data );
+        else:
+            $cart->addProduct ( $product, $params );
+        endif;
+        $session->setLastAddedProductId ( $product->getId () );
+        
+      
+
+      } catch ( Exception $e ) {
+
+
+        $result = '{"status":"error"';
+        $result .= ', "message": "' . str_replace("\"","||",$e->getMessage ()) . '"}';
+        echo $result;
+        exit; 
+        
+      }
+
+
+      endforeach;
+      try{
+        $session->setCartWasUpdated ( true );
+        
+        $cart->save (); 
+      }
+      catch(\Exception $e){
+        $result = '{"status":"error"';
+          $result .= ', "message": "' . str_replace("\"","||",$e->getMessage ()) . '"}';
+          echo $result;
+          exit; 
+      }
+    
+    if(Mage::getStoreConfig('sales/minimum_order/active')):
+      $check_grand_total = $this->checkoutHelper->getQuote()->getBaseSubtotalWithDiscount();
+      
+      $amount = Mage::getStoreConfig('sales/minimum_order/amount');
+      if ($check_grand_total < $amount):
+        $message = Mage::getStoreConfig('sales/minimum_order/error_message');
+        if(!$message) $message = 'Minimum Order Limit is '.$amount;
+            echo json_encode(array('status'=>'error','message'=> __($message)));
+        exit;
+      endif;
+    
+    endif;
+    echo json_encode(array('status'=>'success','message'=> 'true'));
+    exit;
+}
+
+}

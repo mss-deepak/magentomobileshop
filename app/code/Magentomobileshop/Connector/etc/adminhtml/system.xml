@@ -1,0 +1,150 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="magentomobileshop" translate="label" sortOrder="1">
+            <label>Magento Mobile Shop</label>
+        </tab>
+<!-- Configuration section start -->
+        <section id="configuration" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>General</label>
+            <tab>magentomobileshop</tab>
+            <resource>Magentomobileshop_Connector::config</resource>
+            <group id="about_us" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>About Magento Mobile Shop</label>
+                <field id="about_mms" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <frontend_model>Magentomobileshop\Connector\Block\Adminhtml\System\Config\About</frontend_model>
+                </field>
+            </group>
+            <group id="contact_information" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General Configuration </label>
+                <field id="enable_extension" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled App</label>
+                    <source_model>Magentomobileshop\Connector\Model\Config\Source\Enable</source_model>
+                </field>
+                <field id="phone_number" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Phone Number</label>
+                    <comment>Enter your phone number to display on App contact information section.</comment>
+                </field>
+                <field id="email" translate="label" type="text" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Email Id</label>
+                    <comment>Enter your Email Id to display on App contact information section.</comment>
+                </field>
+            </group>
+            <group id="app_pages" translate="label" type="text" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>CMS Page Configuration </label>
+                <field id="cms_page_list" translate="label" type="multiselect" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Cms Pages</label>
+                    <source_model>Magento\Cms\Model\Config\Source\Page</source_model>
+                </field>
+            </group>
+
+            <group id="dashboard" translate="label" type="text" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Manage Dashboard </label>
+                <field id="manage_product_dashboard" translate="label" type="multiselect" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Dashboard Products Slider</label>
+                    <source_model>Magentomobileshop\Connector\Model\Config\Source\Dashboard</source_model>
+                </field>
+                <field id="manage_category_dashboard" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Dashboard Category Slider</label>
+                    <source_model>Magentomobileshop\Connector\Model\Config\Source\Categorys</source_model>
+                </field>
+            </group>
+        </section>
+<!-- Configuration section start -->
+<!--Payment Method Section Start -->
+        <section id="magentomobileshop_payment" translate="label" type="text" sortOrder="104" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Payment Methods</label>
+            <tab>magentomobileshop</tab>
+            <resource>Magentomobileshop_Connector::config</resource>
+            <group id="about_us" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>About Magento Mobile Shop</label>
+                <field id="about_mms" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <frontend_model>Magentomobileshop\Connector\Block\Adminhtml\System\Config\About</frontend_model>
+                </field>
+            </group>
+<!--Bank Transfer Payment start -->
+            <group id="bank_transfer" translate="label" type="text" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Bank Transfer Payment</label>
+                <field id="transfer_message" translate="select" type="select" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <frontend_model>Magentomobileshop\Connector\Block\Adminhtml\System\Config\Banktransfer</frontend_model>
+                </field>
+                <field id="transfer_status" translate="select" type="select" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable/Disable</label>
+                   <source_model>Magentomobileshop\Connector\Model\Config\Source\Banktransfer</source_model>
+                    <comment>Enable payment method for App.</comment>
+                </field>
+
+            </group>
+<!--Bank Transfer Payment end -->
+<!--Authorize.net start -->
+            <group id="authorizenet_directpost" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Authorize.net</label>
+                <field id="authorizenet_message" translate="label" type="select" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <frontend_model>Magentomobileshop\Connector\Block\Adminhtml\System\Config\Authorize</frontend_model>
+                    <comment>Enable payment method for App.</comment>
+                </field>
+                <field id="authorizenet_status" translate="label" type="select" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable/Disable</label>
+                    <source_model>Magentomobileshop\Connector\Model\Config\Source\Authorize</source_model>
+                </field>
+            </group>
+<!--Authorize.net end -->
+<!--Cash On Delivery Payment start -->
+            <group id="cashondelivery" translate="label" type="text" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Cash On Delivery Payment</label>
+                <field id="cod_message" translate="label" type="select" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <frontend_model>Magentomobileshop\Connector\Block\Adminhtml\System\Config\Cashondelivery</frontend_model>
+                    <comment>Enable payment method for App.</comment>
+                </field>
+                <field id="cod_status" translate="label" type="select" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable/Disable</label>
+                    <source_model>Magentomobileshop\Connector\Model\Config\Source\Cashondelivery</source_model>
+                </field>
+            </group>
+<!--Cash On Delivery Payment end -->
+<!--Check/money Order start -->
+            <group id="check_money" translate="label"  sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Check/money Order</label>
+                <field id="check_message" translate="label" type="select" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <frontend_model>Magentomobileshop\Connector\Block\Adminhtml\System\Config\Check</frontend_model>
+                    <comment>Enable payment method for App.</comment>
+                </field>
+                <field id="check_status" translate="label" type="select" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable/Disable</label>
+                    <source_model>Magentomobileshop\Connector\Model\Config\Source\Check</source_model>
+                </field>
+            </group>
+<!--Check/money Order end -->
+        </section>
+<!--Payment Method Section End -->
+<!--Pushnotification section Start  -->
+            <section id="social_login" translate="label" sortOrder="105"  showInWebsite="1" showInStore="1"
+                showInDefault="1" >
+                <label>Social Loging Configuration</label>
+                <tab>magentomobileshop</tab>
+                <resource>Magentomobileshop_Connector::config</resource>
+                <group id="about_us" translate="label" type="text" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>About Magento Mobile Shop</label>
+                <field id="about_mms" translate="label" type="text" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <frontend_model>Magentomobileshop\Connector\Block\Adminhtml\System\Config\About</frontend_model>
+                </field>
+                </group>
+                <group id="google_key" translate="label" sortOrder="13" showInDefault="1" showInStore="1" showInWebsite="1">
+                    <label>Google Key</label>
+                    <field id="client_secret" translate="label" type="text" sortOrder="13" showInStore="1" showInWebsite="1" showInDefault="1">
+                    <label>Privacy Policy</label>
+                    </field>
+                    <field id="client_id" translate="label" type="text" sortOrder="13" showInStore="1" showInWebsite="1" showInDefault="1">
+                    <label>Privacy Policy</label>
+                    </field>
+                </group>
+                <group id="facebook_key" translate="label" sortOrder="14" showInStore="1" showInWebsite="1" showInDefault="1">
+                    <label>Facebook Key</label>
+                    <field id="facebook_id" translate="label" type="text" showInWebsite="1" showInDefault="1" showInStore="1">
+                    <label>Facebook Key</label>
+                    </field>
+                </group>
+            </section>
+<!--Pushnotification section End  -->
+    </system>
+</config>
