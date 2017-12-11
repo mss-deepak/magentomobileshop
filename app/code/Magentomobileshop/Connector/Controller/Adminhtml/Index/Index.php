@@ -48,7 +48,6 @@ class Index extends \Magento\Framework\App\Action\Action
         $final_data       = base64_encode($data);
         $store  = $this->storeManager->getStore();
         $resultLayout = $this->resultLayoutFactory->create();
-        $final_data = "";
         echo $resultLayout->getLayout()
           ->createBlock('Magentomobileshop\Connector\Block\Adminhtml\Msscontent')
           ->setTemplate('Magentomobileshop_Connector::default/Msscontent.phtml')

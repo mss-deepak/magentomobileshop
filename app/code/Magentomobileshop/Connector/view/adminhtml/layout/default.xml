@@ -6,7 +6,6 @@
 >
 	<body>
         <referenceBlock name="content">
-
             <block class="Magentomobileshop\Connector\Block\Adminhtml\Msscontent"  name="Msscontent" template="Magentomobileshop_Connector::default/Msscontent.phtml">
             </block>
         </referenceBlock>

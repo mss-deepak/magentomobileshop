@@ -82,9 +82,10 @@ class ControllerActionPredispatch implements ObserverInterface
             $href       = $static_url . $key;
             $this->messageManager->addNotice(__('Magentomobileshop extension is not activated yet, <a href="' . $href . '">Click here</a> to activate your extension.'));
         }
-        
         if ((!$current) && $adminsession && $mssAppData != '') {
             if ((!$current)) {
+                $params = 'secure_key_miss';
+                $this->coreRegistry->register('secure_key', $params);
                 $str        = self::ACTIVATION_URL;
                 $url        = $str . '?mms_id=';
                 $final_url  = $url . '' . $mssAppData;
@@ -109,6 +110,8 @@ class ControllerActionPredispatch implements ObserverInterface
                 $this->responseFactory->create()->setRedirect($customerBeforeAuthUrl)->sendResponse();
                 exit();
             } elseif ($current != '' && $adminsession->isLoggedIn() && $decode != '') {
+                $params = 'secure_key_miss';
+                $this->coreRegistry->register('secure_key', $params);
                 $str        = self::ACTIVATION_URL;
                 $url        = $str . '?mms_id=';
                 $final_url  = $url . '' . $mssAppData;
@@ -132,7 +135,6 @@ class ControllerActionPredispatch implements ObserverInterface
                 $this->responseFactory->create()->setRedirect($customerBeforeAuthUrl)->sendResponse();
                 exit();
             }
-
         }
     }
 }

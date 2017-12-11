@@ -3,13 +3,15 @@
  * Msscontent view template
  *
  */
-?>
+?> 
+  <?php if($this->setRegister()) { ?>
     <div class="loading">
         <span class="loading-text">We are activating your new mobile app,Please do not close this window or click the Back button on your browser!!
          	<img class="load_img" src="<?php echo $this->getViewFileUrl('Magentomobileshop_Connector::images/magento_logo.png'); ?>">
         </span>
     </div>
-   ?>
+    <?php $this->unsetRegister(); ?>
+    <?php } ?>
     <style type="text/css">
         /* Absolute Center Spinner */
 .loading {
@@ -153,4 +155,3 @@ width: 514;
 }
 }
     </style>
- ?>
