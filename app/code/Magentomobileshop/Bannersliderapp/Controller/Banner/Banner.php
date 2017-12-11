@@ -6,10 +6,12 @@ class Banner extends \Magento\Framework\App\Action\Action
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magentomobileshop\Connector\Helper\Data $customHelper,
-        \Magento\Store\Model\StoreManagerInterface $storeManager
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
     ) {
-        $this->customHelper = $customHelper;
-        $this->storeManager = $storeManager;
+        $this->customHelper      = $customHelper;
+        $this->storeManager      = $storeManager;
+        $this->resultJsonFactory = $resultJsonFactory;
         parent::__construct($context);
     }
 
@@ -21,6 +23,7 @@ class Banner extends \Magento\Framework\App\Action\Action
             $result        = $connection->fetchAll("SELECT * FROM magentomobile_bannersliderapp");
             $array         = array();
             $k             = 0;
+            $result        = $this->resultJsonFactory->create();
             foreach ($result as $key => $value) {
                 $array[$k]['banner_id']         = $value['banner_id'];
                 $array[$k]['name']              = $value['name'];
@@ -35,10 +38,11 @@ class Banner extends \Magento\Framework\App\Action\Action
                 $array[$k]['image_description'] = $value['image_alt'];
                 $k++;
             }
-            echo json_encode(array('status' => 'success', 'data' => $array));
+            $result->setData(['status' => 'success', 'data' => $array]);
+            return $result;
         } catch (\Exception $e) {
-            echo $this->messageManager->addError($e->getMessage());
-            exit;
+            $result->setData(['status' => 'success', 'data' => __($e->getMessage())]);
+            return $result;
         }
     }
 }

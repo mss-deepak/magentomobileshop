@@ -17,7 +17,7 @@ class AddRow extends \Magento\Backend\App\Action
         $rowId   = (int) $this->getRequest()->getParam('id');
         $rowData = $this->_objectManager->create('Magentomobileshop\Bannersliderapp\Model\Grid');
         if ($rowId) {
-            $rowData  = $rowData->load($rowId);
+            $rowData = $rowData->load($rowId);
             $rowName = $rowData->getName();
             if (!$rowData->getBannerId()) {
                 $this->messageManager->addError(__('row data no longer exist.'));

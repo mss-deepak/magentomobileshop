@@ -6,7 +6,7 @@ use Magento\Framework\DataObject;
 use Magento\Store\Model\StoreManagerInterface;
 
 class LogoImage extends AbstractRenderer
-{    
+{
     private $_storeManager;
     public function __construct(
         \Magento\Backend\Block\Context $context,
@@ -20,12 +20,11 @@ class LogoImage extends AbstractRenderer
     public function render(DataObject $row)
     {
         $imageName = $row->getRbBannerImage();
-        if ($imageName=="") {
+        if ($imageName == "") {
             return "";
         }
         $mediaDirectory = $this->_storeManager->getStore()->getBaseUrl(
             \Magento\Framework\UrlInterface::URL_TYPE_MEDIA
         );
-    
     }
 }

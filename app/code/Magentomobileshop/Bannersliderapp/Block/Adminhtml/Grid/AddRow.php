@@ -38,7 +38,6 @@ class AddRow extends \Magento\Backend\Block\Widget\Form\Container
         if ($this->hasFormActionUrl()) {
             return $this->getData('form_action_url');
         }
-
         return $this->getUrl('*/*/save');
     }
 }

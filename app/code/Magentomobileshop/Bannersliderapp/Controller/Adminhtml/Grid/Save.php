@@ -18,7 +18,7 @@ class Save extends \Magento\Backend\App\Action
     ) {
 
         $this->_fileUploaderFactory = $fileUploaderFactory;
-        $this->fileSystem = $fileSystem;
+        $this->fileSystem           = $fileSystem;
         parent::__construct($context);
     }
     public function execute()
@@ -46,8 +46,8 @@ class Save extends \Magento\Backend\App\Action
                     $uploader->setAllowedExtensions(['jpg', 'jpeg', 'gif', 'png']);
                     $uploader->setAllowRenameFiles(false);
                     $uploader->setFilesDispersion(false);
-                    $path = $this->fileSystem->getDirectoryRead(DirectoryList::MEDIA)->getAbsolutePath('images/');
-                    $result = $uploader->save($path);
+                    $path              = $this->fileSystem->getDirectoryRead(DirectoryList::MEDIA)->getAbsolutePath('images/');
+                    $result            = $uploader->save($path);
                     $data['thumbnail'] = $result['file'];
                 } catch (\Exception $e) {
                     if ($e->getCode() == 0) {
@@ -73,5 +73,4 @@ class Save extends \Magento\Backend\App\Action
         // return;
         return $this->_authorization->isAllowed('Magentomobileshop_Bannersliderapp::add_auction');
     }
-
 }

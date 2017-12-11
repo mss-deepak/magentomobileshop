@@ -1,4 +1,13 @@
 <?php
+/**
+ * Magentomobileshop Extension
+ *
+ * @category Magentomobileshop
+ * @package Magentomobileshop_Connector
+ * @author Magentomobileshop
+ * @copyright Copyright (c) 2012-2018 Master Software Solutions (http://mastersoftwaretechnologies.com)
+ */
+
 namespace Magentomobileshop\Connector\Helper;
 
 use Magento\Framework\Pricing\PriceCurrencyInterface;
@@ -38,7 +47,8 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\ConfigurableProduct\Helper\Data $helper,
         \Magento\Framework\UrlInterface $urlbuilder,
         \Magento\Catalog\Helper\Product $catalogProduct,
-        \Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable $configurableType
+        \Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable $configurableType,
+        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
     ) {
         $this->productModel        = $productModel;
         $this->imageHelper         = $imageHelper;
@@ -60,11 +70,13 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         $this->_objectManager      = \Magento\Framework\App\ObjectManager::getInstance();
         $this->urlBuilder          = $urlbuilder;
         $this->helper              = $helper;
+        $this->resultJsonFactory  = $resultJsonFactory;
     }
 
     // Magento Mobile Shop Connector api Helper to load Product
     public function loadProduct($product_id)
     {
+        $result         = $this->resultJsonFactory->create();
         $all_custom_option_array = array();
         $product                 = $this->productModel->load($product_id);
         if ($product->getId()) {
@@ -102,7 +114,6 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                     $inner_inc = 0;
                     if ($optionVal->getValues()) {
                         foreach ($optionVal->getValues() as $valuesKey => $valuesVal) {
-
                             $all_custom_option_array[$inc]['custom_option_value_array'][$inner_inc]['id']    = $valuesVal->getId();
                             $all_custom_option_array[$inc]['custom_option_value_array'][$inner_inc]['title'] = $valuesVal->getTitle();
 
@@ -113,7 +124,6 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                             $all_custom_option_array[$inc]['custom_option_value_array'][$inner_inc]['sort_order'] = $valuesVal->getSortOrder();
 
                             if ($valuesVal->getPriceType() == "percent") {
-
                                 $defaultcustomprice = str_replace(",", "", ($product->getFinalPrice()));
                                 // $customproductprice = strval(round($this->convert_currency($defaultcustomprice,$basecurrencycode,$currentcurrencycode),2));
                                 $all_custom_option_array[$inc]['custom_option_value_array'][$inner_inc]['price'] = str_replace(",", "", round((floatval($defaultcustomprice) * floatval(round($valuesVal->getPrice(), 1)) / 100), 2));
@@ -164,16 +174,15 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
             );
             // If product is configurable
             if ($product->getTypeId() == 'configurable') {
-
                 $childrenIds = array_values($this->configurableType->getChildrenIds($product->getId())[0]);
                 $options     = $this->helper->getOptions($product, $this->getAllowProducts());
                 $attributes  = [];
                 foreach ($product->getTypeInstance()->getConfigurableAttributes($product) as $attribute) {
                     $attributeOptionsData = $this->getAttributeOptionsData($attribute, $options);
                     if ($attributeOptionsData) {
-                        $productAttribute         = $attribute->getProductAttribute();
-                        $attributeId              = $productAttribute->getId();
-                        $attributes[] = [
+                        $productAttribute = $attribute->getProductAttribute();
+                        $attributeId      = $productAttribute->getId();
+                        $attributes[]     = [
                             'id'      => $attributeId,
                             'code'    => $productAttribute->getAttributeCode(),
                             'label'   => $productAttribute->getStoreLabel($product->getStoreId()),
@@ -199,7 +208,6 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
 
                 $productdetail['configurable']  = $configurableOptionData;
                 $productdetail['childProducts'] = $childern;
-
             }
             //If Product is Downloadable
             if ($product->getTypeId() == 'downloadable') {
@@ -211,7 +219,8 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
             $productdetail['status']  = 'error';
             $productdetail['message'] = "We didn't find any product with this id";
         }
-        return $productdetail;
+        $result->setData($productdetail);
+        return $result;
     }
 
     // Functionality to check product is in wishlist or not
@@ -223,20 +232,23 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
             if ($currentUserWishlist) {
                 $wishListItemCollection = $currentUserWishlist->getItemCollection();
             } else {
-                return false;
+                $result->setData(['status'=>false]);
+                return $result;
             }
             $wishlist_product_id = array();
             foreach ($wishListItemCollection as $item) {
-
                 $wishlist_product_id[] = $item->getProductId();
             }
             if (in_array($productId, $wishlist_product_id)) {
-                return true;
+                $result->setData(['status'=>true]);
+                return $result;
             } else {
-                return false;
+                $result->setData(['status'=>false]);
+                return $result;
             }
         } else {
-            return false;
+            $result->setData(['status'=>false]);
+            return $result;
         }
     }
 
@@ -273,7 +285,8 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                 }
             }
         }
-        return $data;
+            $result->setData($data);
+            return $result;
     }
 
     /**
@@ -297,7 +310,6 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
             )->setDateOrder();
             if (count($collection->getdata()) > 0) {
                 foreach ($collection->getItems() as $review) {
-
                     // Magento Mobile Shop get rating of products
                     $ratingCollection = $this->_voteFactory->create()->getResourceCollection()->setReviewFilter(
                         $review->getReviewId()
@@ -330,9 +342,11 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                 $avg = array_sum($ratings) / count($ratings);
             }
             $result['rating'] = number_format($avg / 20, 1, '.', ',');
+            $result->setData($result);
             return $result;
         } else {
-            return false;
+            $result->setData(['status'=>false]);
+            return $result;
         }
     }
 
@@ -394,10 +408,10 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
                 'code'    => $attribute->getAttributeCode(),
                 'label'   => $attribute->getStoreLabel(),
                 'options' => $attributeValues,
-            ];
+                ];
         }
-
-        return $configurableAttributesData;
+        $result->setData($configurableAttributesData);
+        return $result;
     }
 
     /**
@@ -413,7 +427,8 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
         $this->attributeFactory = \Magento\Framework\App\ObjectManager::getInstance()
             ->get(\Magento\Catalog\Model\ResourceModel\Eav\AttributeFactory::class);
 
-        return $this->attributeFactory;
+        $result->setData($attributeFactory);
+        return $result;
     }
 
     /**
@@ -467,7 +482,8 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
             }
             $linkArr[] = $tmpLinkItem;
         }
-        return $linkArr;
+        $result->setData($linkArr);
+        return $result;
     }
 
     /**
@@ -519,13 +535,13 @@ class Products extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     public function getSpecialPriceProduct($product)
-    { 
-        $specialprice = $product->getPriceInfo()->getPrice('special_price')->getAmount()->getValue();
+    {
+        $specialprice         = $product->getPriceInfo()->getPrice('special_price')->getAmount()->getValue();
         $final_price_with_tax = $product->getPriceInfo()->getPrice('regular_price')->getAmount()->getValue();
-         if($specialprice >= $final_price_with_tax){
+        if ($specialprice >= $final_price_with_tax) {
             return $final_price_with_tax;
-         } else {
+        } else {
             return $specialprice;
-         }
+        }
     }
 }

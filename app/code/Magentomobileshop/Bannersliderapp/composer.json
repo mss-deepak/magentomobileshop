@@ -1,0 +1,20 @@
+{
+  "name": "magentomobileshop/bannersliderapp",
+  "description": "Banner slider for app",
+  "require": {
+    "php": "~5.5.0|~5.6.0|~7.0.0"
+  },
+  "type": "magento2-module",
+  "version": "2.0.0.1",
+  "license": [
+    "proprietary"
+  ],
+  "autoload": {
+    "files": [
+      "registration.php"
+    ],
+    "psr-4": {
+      "Magentomobileshop\\Bannersliderapp\\": ""
+    }
+  }
+}

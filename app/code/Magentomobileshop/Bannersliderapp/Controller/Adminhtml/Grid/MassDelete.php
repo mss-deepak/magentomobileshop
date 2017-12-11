@@ -15,13 +15,13 @@ class MassDelete extends \Magento\Backend\App\Action
         Filter $filter,
         CollectionFactory $collectionFactory
     ) {
-        $this->_filter = $filter;
+        $this->_filter            = $filter;
         $this->_collectionFactory = $collectionFactory;
         parent::__construct($context);
     }
     public function execute()
     {
-        $collection = $this->_filter->getCollection($this->_collectionFactory->create());
+        $collection    = $this->_filter->getCollection($this->_collectionFactory->create());
         $recordDeleted = 0;
         foreach ($collection->getItems() as $auctionProduct) {
             $auctionProduct->setId($auctionProduct->getBannerId());
@@ -31,7 +31,7 @@ class MassDelete extends \Magento\Backend\App\Action
         $this->messageManager->addSuccess(
             __('A total of %1 record(s) have been deleted.', $recordDeleted)
         );
- 
+
         return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)->setPath('*/*/index');
     }
     protected function _isAllowed()

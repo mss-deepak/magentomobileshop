@@ -1,4 +1,13 @@
 <?php
+/**
+ * Magentomobileshop Extension
+ *
+ * @category Magentomobileshop
+ * @package Magentomobileshop_Connector
+ * @author Magentomobileshop
+ * @copyright Copyright (c) 2012-2018 Master Software Solutions (http://mastersoftwaretechnologies.com)
+ */
+
 namespace Magentomobileshop\Connector\Controller\Cart;
 
 class ClearAllCart extends \Magento\Framework\App\Action\Action
@@ -7,11 +16,12 @@ class ClearAllCart extends \Magento\Framework\App\Action\Action
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magentomobileshop\Connector\Helper\Data $customHelper,
-        \Magento\Checkout\Model\Cart $cart
-
+        \Magento\Checkout\Model\Cart $cart,
+        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
     ) {
-        $this->cart         = $cart;
-        $this->customHelper = $customHelper;
+        $this->cart              = $cart;
+        $this->customHelper      = $customHelper;
+        $this->resultJsonFactory = $resultJsonFactory;
         parent::__construct($context);
     }
 
@@ -22,17 +32,19 @@ class ClearAllCart extends \Magento\Framework\App\Action\Action
         $this->viewId   = $this->customHelper->viewConfig($this->getRequest()->getHeader('viewid'));
         $this->currency = $this->customHelper->currencyConfig($this->getRequest()->getHeader('currency'));
         $cart           = $this->cart->getQuote();
+        $result         = $this->resultJsonFactory->create();
         if (!count($cart->getAllItems())) {
-            echo json_encode(array('status' => 'error', 'message' => "No item in your cart"));
+            $result->setData(['status' => 'error', 'message' => __('No item in your cart')]);
+            return $result;
         } else {
             try {
                 $this->cart->truncate();
-                echo json_encode(array('status' => 'success', 'message' => "Cleared all cart Items"));
-            } catch (exception $e) {
-                echo json_encode(array('status' => 'error', 'message' => $e->getMessage()));
+                $result->setData(['status' => 'success', 'message' => __('Cleared all cart Items')]);
+                return $result;
+            } catch (\Exception $e) {
+                $result->setData(['status' => 'error', 'message' => __($e->getMessage())]);
+                return $result;
             }
         }
-
-        exit();
     }
 }

@@ -1,52 +1,55 @@
 <?php
+/**
+ * Magentomobileshop Extension
+ *
+ * @category Magentomobileshop
+ * @package Magentomobileshop_Connector
+ * @author Magentomobileshop
+ * @copyright Copyright (c) 2012-2018 Master Software Solutions (http://mastersoftwaretechnologies.com)
+ */
+
 namespace Magentomobileshop\Connector\Controller\Token;
- 
- 
- 
+
 class Settoken extends \Magento\Framework\App\Action\Action
 {
     const XML_SECURE_KEY_STATUS = 'magentomobileshop/key/status';
-    const XML_SECURE_KEY = 'magentomobileshop/secure/key';
-	
-    public function __construct(\Magento\Framework\App\Action\Context $context,
-                                \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-                                \Magento\Config\Model\ResourceModel\Config $resourceConfig,
-                                \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList,
-                                \Psr\Log\LoggerInterface $logger	
-    							 )
-								{
-								    parent::__construct($context);
-                                    $this->scopeConfig = $scopeConfig;
-                                    $this->resourceConfig = $resourceConfig;
-                                    $this->cacheTypeList = $cacheTypeList;
-                                    $this->logger = $logger;
-								}
+    const XML_SECURE_KEY        = 'magentomobileshop/secure/key';
+    protected $resultJsonFactory;
+    public function __construct(
+        \Magento\Framework\App\Action\Context $context,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        \Magento\Config\Model\ResourceModel\Config $resourceConfig,
+        \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList,
+        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
+        \Magento\Framework\App\RequestInterface $requestInterface
+    ) {
+        parent::__construct($context);
+        $this->scopeConfig       = $scopeConfig;
+        $this->resourceConfig    = $resourceConfig;
+        $this->cacheTypeList     = $cacheTypeList;
+        $this->resultJsonFactory = $resultJsonFactory;
+        $this->request           = $requestInterface;
+    }
 
-        public function execute()
-        {   
-            try{
-            $params = $this->getRequest ()->getParams ();
-                  
-            if(isset($params['secure_key']) && isset($params['status'])):
-
-                $this->resourceConfig->saveConfig(self::XML_SECURE_KEY, $params['secure_key'], 'default', 0); 
-                $this->resourceConfig->saveConfig(self::XML_SECURE_KEY_STATUS, $params['status'], 'default', 0); 
+    public function execute()
+    {
+        $result = $this->resultJsonFactory->create();
+        try {
+            $params = $this->request->getParams();
+            if (isset($params['secure_key']) && isset($params['status'])) {
+                $this->resourceConfig->saveConfig(self::XML_SECURE_KEY, $params['secure_key'], 'default', 0);
+                $this->resourceConfig->saveConfig(self::XML_SECURE_KEY_STATUS, $params['status'], 'default', 0);
                 $this->cacheTypeList->cleanType('config');
 
-                echo json_encode(array('status'=>'success','message'=>'Data updated.'));
-            else:
-
-                echo json_encode(array('status'=>'error','message'=> $this->logger->addDebug('Required parameters are missing.')));
-
-            endif;
-
+                $result->setData(['status' => 'success', 'message' => 'Data updated.']);
+                return $result;
+            } else {
+                $result->setData(['status' => 'error', 'message' => 'Required parameters are missing.']);
+                return $result;
             }
-            catch(\Exception $e){
-
-                echo json_encode(array('status'=>'error','message'=>  $this->logger->debug($e->getMessage)));
-
-            }
-
+        } catch (\Exception $e) {
+            $result->setData(['status' => 'error', 'message' => $e->getMessage()]);
+            return $result;
         }
-
+    }
 }

@@ -1,11 +1,20 @@
 <?php
+/**
+ * Magentomobileshop Extension
+ *
+ * @category Magentomobileshop
+ * @package Magentomobileshop_Connector
+ * @author Magentomobileshop
+ * @copyright Copyright (c) 2012-2018 Master Software Solutions (http://mastersoftwaretechnologies.com)
+ */
+
 namespace Magentomobileshop\Connector\Block\Adminhtml\System\Config;
 
     use Magento\Backend\Block\Template\Context;
     use Magento\Config\Block\System\Config\Form\Field;
     use Magento\Framework\Data\Form\Element\AbstractElement;
 
-class cashondelivery extends Field
+class Cashondelivery extends Field
 {
     /**
      * @param Context $context

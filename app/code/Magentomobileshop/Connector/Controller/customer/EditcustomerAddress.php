@@ -1,4 +1,13 @@
 <?php
+/**
+ * Magentomobileshop Extension
+ *
+ * @category Magentomobileshop
+ * @package Magentomobileshop_Connector
+ * @author Magentomobileshop
+ * @copyright Copyright (c) 2012-2018 Master Software Solutions (http://mastersoftwaretechnologies.com)
+ */
+
 namespace Magentomobileshop\Connector\Controller\Customer;
 
 class EditcustomerAddress extends \Magento\Framework\App\Action\Action
@@ -11,7 +20,9 @@ class EditcustomerAddress extends \Magento\Framework\App\Action\Action
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magentomobileshop\Connector\Helper\Data $customHelper,
         \Magento\Customer\Model\Customer $customer,
-        \Magento\Customer\Model\AddressFactory $addressFactory
+        \Magento\Customer\Model\AddressFactory $addressFactory,
+        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
+        \Magento\Framework\App\RequestInterface $requestInterface
     ) {
         $this->customerSession   = $customerSession;
         $this->resultPageFactory = $resultPageFactory;
@@ -20,6 +31,8 @@ class EditcustomerAddress extends \Magento\Framework\App\Action\Action
         $this->customHelper      = $customHelper;
         $this->customer          = $customer;
         $this->addressFactory    = $addressFactory;
+        $this->resultJsonFactory = $resultJsonFactory;
+        $this->request           = $requestInterface;
         parent::__construct($context);
     }
 /*
@@ -38,10 +51,10 @@ class EditcustomerAddress extends \Magento\Framework\App\Action\Action
 
     protected function editAddressApi()
     {
-
+        $result = $this->resultJsonFactory->create();
         if ($this->customerSession->isLoggedIn()) {
-            $addressId   = $this->getRequest()->getParam('addressId');
-            $addressData = json_decode($this->getRequest()->getParam('addressData'), 1);
+            $addressId   = $this->request->getParam('addressId');
+            $addressData = json_decode($this->request->getParam('addressData'), 1);
             $address     = $this->addressFactory->create();
             $address->load($addressId);
             $address->setFirstname($addressData['firstname']);
@@ -55,24 +68,20 @@ class EditcustomerAddress extends \Magento\Framework\App\Action\Action
             } else {
                 $address->setRegionId($addressData['region_id']);
             }
-
             $address->setStreet($addressData['street']);
-            // @$address->setIsDefaultBilling($addressData['is_default_billing']);
-            // @$address->setIsDefaultShipping($addressData['is_default_shipping']);
             $address->setSaveInAddressBook('1');
             try {
                 $address->setId($addressId);
                 $address->save();
-                //  $customer->save();
-                echo json_encode(array('status' => 'success', 'message' => __('Address Updated successfully.')));
-                exit;
-            } catch (\Mage_Core_Exception $e) {
-                echo json_encode(array('status' => 'error', 'message' => $e->getMessage()));
-                exit;
+                $result->setData(['status' => 'success', 'message' => __('Address Updated successfully.')]);
+                return $result;
+            } catch (\Exception $e) {
+                $result->setData(['status' => 'error', 'message' => __($e->getMessage())]);
+                return $result;
             }
         } else {
-            echo json_encode(array('status' => 'error', 'message' => __('Kindly Sign in first.')));
-            exit;
+            $result->setData(['status' => 'error', 'message' => __('Kindly Sign in first.')]);
+            return $result;
         }
     }
 }

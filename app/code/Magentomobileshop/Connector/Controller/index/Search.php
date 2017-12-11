@@ -1,22 +1,35 @@
 <?php
-namespace Magentomobileshop\Connector\Controller\Product;
+/**
+ * Magentomobileshop Extension
+ *
+ * @category Magentomobileshop
+ * @package Magentomobileshop_Connector
+ * @author Magentomobileshop
+ * @copyright Copyright (c) 2012-2018 Master Software Solutions (http://mastersoftwaretechnologies.com)
+ */
+
+namespace Magentomobileshop\Connector\Controller\Index;
 
 class Search extends \Magento\Framework\App\Action\Action
 {
-    public function __construct(\Magento\Framework\App\Action\Context $context,
+    public function __construct(
+        \Magento\Framework\App\Action\Context $context,
         \Magento\Catalog\Model\Product $productModel,
         \Magento\Catalog\Helper\Image $imageHelper,
         \Magento\CatalogInventory\Api\StockStateInterface $stockStateInterface,
         \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory,
-        \Magentomobileshop\Connector\Helper\Data $customHelper
+        \Magentomobileshop\Connector\Helper\Data $customHelper,
+        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
+        \Magento\Framework\App\RequestInterface $requestInterface
     ) {
         $this->productModel             = $productModel;
         $this->imageHelper              = $imageHelper;
         $this->stockStateInterface      = $stockStateInterface;
         $this->productCollectionFactory = $productCollectionFactory;
         $this->customHelper             = $customHelper;
+        $this->resultJsonFactory        = $resultJsonFactory;
+        $this->request                  = $requestInterface;
         parent::__construct($context);
-
     }
 
     public function execute()
@@ -25,14 +38,13 @@ class Search extends \Magento\Framework\App\Action\Action
         $this->storeId  = $this->customHelper->storeConfig($this->getRequest()->getHeader('storeid'));
         $this->viewId   = $this->customHelper->viewConfig($this->getRequest()->getHeader('viewid'));
         $this->currency = $this->customHelper->currencyConfig($this->getRequest()->getHeader('currency'));
-        $searchstring   = $this->getRequest()->getParam('search');
-        $page           = ($this->getRequest()->getParam('page')) ? ($this->getRequest()->getParam('page')) : 1;
-        $limit          = ($this->getRequest()->getParam('limit')) ? ($this->getRequest()->getParam('limit')) : 10;
-        $order          = ($this->getRequest()->getParam('order')) ? ($this->getRequest()->getParam('order')) : 'entity_id';
-
-        $productlist = array();
-        if ($searchstring):
-
+        $searchstring   = $this->request->getParam('search');
+        $page           = ($this->request->getParam('page')) ? ($this->request->getParam('page')) : 1;
+        $limit          = ($this->request->getParam('limit')) ? ($this->request->getParam('limit')) : 10;
+        $order          = ($this->request->getParam('order')) ? ($this->request->getParam('order')) : 'entity_id';
+        $result = $this->resultJsonFactory->create();
+        $productlist    = array();
+        if ($searchstring) {
             $products = $this->productCollectionFactory->create();
             $products->addAttributeToSelect(array('name', 'entity_id', 'status', 'visibility'), 'inner')
                 ->setPageSize($limit)
@@ -79,15 +91,16 @@ class Search extends \Magento\Framework\App\Action\Action
                         ->getUrl(),
                 );
             }
-            if (sizeof($productlist)):
-                echo json_encode($productlist);
-            else:
-                $message = __('There are no products matching the selection');
-                echo json_encode(array('status' => 'error', 'message' => $message));
-            endif;
-        else:
-            $message = __('Search string is required');
-            echo json_encode(array('status' => 'error', 'message' => $message));
-        endif;
+            if (sizeof($productlist)) {
+                $result->setData([$productlist]);
+                return $result;
+            } else {
+                $result->setData(['status' => 'error', 'message' => __('There are no products matching the selection')]);
+                return $result;
+            }
+        } else {
+            $result->setData(['status' => 'error', 'message' => __('Search string is required')]);
+            return $result;
+        }
     }
 }

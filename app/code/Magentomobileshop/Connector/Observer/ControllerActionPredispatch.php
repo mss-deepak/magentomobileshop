@@ -1,4 +1,13 @@
 <?php
+/**
+ * Magentomobileshop Extension
+ *
+ * @category Magentomobileshop
+ * @package Magentomobileshop_Connector
+ * @author Magentomobileshop
+ * @copyright Copyright (c) 2012-2018 Master Software Solutions (http://mastersoftwaretechnologies.com)
+ */
+
 namespace Magentomobileshop\Connector\Observer;
 
 use \Magento\Framework\Event\Observer;
@@ -65,7 +74,7 @@ class ControllerActionPredispatch implements ObserverInterface
         $current = $this->scopeConfig->getValue('magentomobileshop/secure/key');
 
 
-        if (!$this->scopeConfig->getValue(self::XML_SECURE_KEY) and $adminsession) {
+        if (!$this->scopeConfig->getValue(self::XML_SECURE_KEY) && $adminsession) {
             $static_url = 'https://www.magentomobileshop.com/user/buildApp?key_info=';
             $email      = base64_encode($this->scopeConfig->getValue(self::TRNS_EMAIL));
             $url        = base64_encode($this->storeManager->getStore()->getBaseUrl());
@@ -74,7 +83,7 @@ class ControllerActionPredispatch implements ObserverInterface
             $this->messageManager->addNotice(__('Magentomobileshop extension is not activated yet, <a href="' . $href . '">Click here</a> to activate your extension.'));
         }
         
-        if ((!$current) and $adminsession and $mssAppData != '') {
+        if ((!$current) && $adminsession && $mssAppData != '') {
             if ((!$current)) {
                 $str        = self::ACTIVATION_URL;
                 $url        = $str . '?mms_id=';
@@ -96,10 +105,10 @@ class ControllerActionPredispatch implements ObserverInterface
                 $this->cacheTypeList->cleanType('config');
                 $this->coreSession->setAppDatas($mssData[0]);
                 $this->coreRegistry->unregister('mms_app_data');
-                $customerBeforeAuthUrl = $this->urlInterface->getUrl('magentomobileshop_connector/system_connector/index');
+                $customerBeforeAuthUrl = $this->urlInterface->getUrl('connector/index/index');
                 $this->responseFactory->create()->setRedirect($customerBeforeAuthUrl)->sendResponse();
                 exit();
-            } elseif ($current != '' and $adminsession->isLoggedIn() and $decode != '') {
+            } elseif ($current != '' && $adminsession->isLoggedIn() && $decode != '') {
                 $str        = self::ACTIVATION_URL;
                 $url        = $str . '?mms_id=';
                 $final_url  = $url . '' . $mssAppData;
@@ -119,7 +128,7 @@ class ControllerActionPredispatch implements ObserverInterface
                 $this->cacheTypeList->cleanType('config');
                 $this->coreSession->setAppDatas($mssData[0]);
                 $this->coreRegistry->unregister('mms_app_data');
-                $customerBeforeAuthUrl = $this->urlInterface->getUrl('magentomobileshop_connector/system_connector/index');
+                $customerBeforeAuthUrl = $this->urlInterface->getUrl('connector/index/index');
                 $this->responseFactory->create()->setRedirect($customerBeforeAuthUrl)->sendResponse();
                 exit();
             }

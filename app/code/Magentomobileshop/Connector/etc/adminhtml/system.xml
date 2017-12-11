@@ -63,7 +63,7 @@
                 </field>
             </group>
 <!--Bank Transfer Payment start -->
-            <group id="bank_transfer" translate="label" type="text" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="banktransfer" translate="label" type="text" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Bank Transfer Payment</label>
                 <field id="transfer_message" translate="select" type="select" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
                     <frontend_model>Magentomobileshop\Connector\Block\Adminhtml\System\Config\Banktransfer</frontend_model>
@@ -77,7 +77,7 @@
             </group>
 <!--Bank Transfer Payment end -->
 <!--Authorize.net start -->
-            <group id="authorizenet_directpost" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="authorizenet" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Authorize.net</label>
                 <field id="authorizenet_message" translate="label" type="select" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
                     <frontend_model>Magentomobileshop\Connector\Block\Adminhtml\System\Config\Authorize</frontend_model>
@@ -103,7 +103,7 @@
             </group>
 <!--Cash On Delivery Payment end -->
 <!--Check/money Order start -->
-            <group id="check_money" translate="label"  sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="checkmoney" translate="label"  sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Check/money Order</label>
                 <field id="check_message" translate="label" type="select" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
                     <frontend_model>Magentomobileshop\Connector\Block\Adminhtml\System\Config\Check</frontend_model>

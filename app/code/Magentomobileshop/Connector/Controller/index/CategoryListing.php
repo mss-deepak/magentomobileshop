@@ -1,4 +1,13 @@
 <?php
+/**
+ * Magentomobileshop Extension
+ *
+ * @category Magentomobileshop
+ * @package Magentomobileshop_Connector
+ * @author Magentomobileshop
+ * @copyright Copyright (c) 2012-2018 Master Software Solutions (http://mastersoftwaretechnologies.com)
+ */
+
 namespace Magentomobileshop\Connector\Controller\index;
 
 class CategoryListing extends \Magento\Framework\App\Action\Action
@@ -28,7 +37,6 @@ class CategoryListing extends \Magento\Framework\App\Action\Action
         $this->currency = $this->customHelper->currencyConfig($this->getRequest()->getHeader('currency'));
         $result         = $this->resultJsonFactory->create();
         return $result->setData($this->getRoot());
-        exit;
     }
 
     public function getRoot($recursionLevel = 3)
@@ -53,10 +61,8 @@ class CategoryListing extends \Magento\Framework\App\Action\Action
             if ($node->getIsActive() && $category_model->load($node->getId())->getIncludeInMenu()) {
                 $categoryTreeData[] = $this->getNodeChildrenData($node);
             }
-
         }
         return $categoryTreeData;
-
     }
 
     protected function getNodeChildrenData(\Magento\Framework\Data\Tree\Node $node)
@@ -68,14 +74,12 @@ class CategoryListing extends \Magento\Framework\App\Action\Action
         );
 
         foreach ($node->getChildren() as $childNode) {
-
             if (!array_key_exists('children', $data)) {
                 $data['children'] = array();
             }
             if ($childNode->getIsActive()) {
                 $data['children'][] = $this->getNodeChildrenData($childNode);
             }
-
         }
         return $data;
     }

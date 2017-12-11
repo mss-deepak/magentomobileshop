@@ -33,20 +33,7 @@
 			 
 			 parent="Magentomobileshop_Connector::advanced_connector" 
 			 action="grid/grid"
-	
-
 		/>
-
-		
-<!--  		 <add id="Magentomobileshop_Connector::connector_banner" title="Manage Banner" module="Magentomobileshop_Connector" sortOrder="13"  parent="Magentomobileshop_Connector::advanced_connector" 
- 				action="adminhtml/system_config/edit/section/configuration"	resource="Magentomobileshop_Connector::connector_banner"/> -->
- 		 
- 		<!--		<add id="Magentomobileshop_Connector::connector_notification" title="Push Notification" module="Magentomobileshop_Connector" sortOrder="14"  parent="Magentomobileshop_Connector::advanced_connector" 
- 				action="magentomobileshop_connector/notification"	resource="Magentomobileshop_Connector::connector_notification"/>
- 			 
- 		        <add id="Magentomobileshop_Connector::connector_support" title="Connector Support" module="Magentomobileshop_Connector" sortOrder="15"  parent="Magentomobileshop_Connector::advanced_connector" 
- 				action="magentomobileshop_connector/support"	resource="Magentomobileshop_Connector::connector_support"/> -->
-
     </menu>
 </config>
 

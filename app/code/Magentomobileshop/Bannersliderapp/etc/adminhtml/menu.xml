@@ -1,14 +1,5 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
     <menu>
-       <!--  <add id="Magentomobileshop_Bannersliderapp::manager" title="Grid Manager" module="Magentomobileshop_Bannersliderapp" sortOrder="1000" resource="Magentomobileshop_Bannersliderapp::manager"/>
-        <add id="Magentomobileshop_Bannersliderapp::add_row" title="Grid Manager" module="Magentomobileshop_Bannersliderapp" sortOrder="2000" parent="Magentomobileshop_Bannersliderapp::manager" action="grid/grid" resource="Magentomobileshop_Bannersliderapp::add_row"/> -->
-  <!--       <add id="Magentomobileshop_Connector::bannersliderapp" 
-			 title="Manage Banner" 
-			 module="Magentomobileshop_Connector" 
-			 sortOrder="13"  
-			 resource="Magento_Backend::content"
-			 parent="Magentomobileshop_Connector::advanced_connector" 
-			 action="grid/grid"/> -->
     </menu>
 </config>

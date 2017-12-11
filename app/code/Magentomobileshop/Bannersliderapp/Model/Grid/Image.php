@@ -1,16 +1,17 @@
 <?php
 namespace Magentomobileshop\Bannersliderapp\Model\Grid;
-use Magento\Framework\UrlInterface;
+
 use Magento\Framework\Filesystem;
-use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\UrlInterface;
+
 class Image
 {
     /**
      * media sub folder
      * @var string
      */
-    protected $subDir = 'magentomobileshop/bannersliderapp/image'; 
-     
+    protected $subDir = 'magentomobileshop/bannersliderapp/image';
+
     /**
      * url builder
      *
@@ -28,8 +29,7 @@ class Image
     public function __construct(
         UrlInterface $urlBuilder,
         Filesystem $fileSystem
-    )
-    {
+    ) {
         $this->urlBuilder = $urlBuilder;
         $this->fileSystem = $fileSystem;
     }
@@ -40,6 +40,6 @@ class Image
      */
     public function getBaseUrl()
     {
-        return $this->urlBuilder->getBaseUrl(['_type' => UrlInterface::URL_TYPE_MEDIA]).$this->subDir.'/image/';
+        return $this->urlBuilder->getBaseUrl(['_type' => UrlInterface::URL_TYPE_MEDIA]) . $this->subDir . '/image/';
     }
 }

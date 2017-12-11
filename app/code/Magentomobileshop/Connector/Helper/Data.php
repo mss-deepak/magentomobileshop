@@ -1,4 +1,13 @@
 <?php
+/**
+ * Magentomobileshop Extension
+ *
+ * @category Magentomobileshop
+ * @package Magentomobileshop_Connector
+ * @author Magentomobileshop
+ * @copyright Copyright (c) 2012-2018 Master Software Solutions (http://mastersoftwaretechnologies.com)
+ */
+
 namespace Magentomobileshop\Connector\Helper;
 
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
@@ -24,7 +33,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Wishlist\Model\WishlistFactory $wishlistRepository,
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
-        \Magento\Tax\Api\TaxCalculationInterface $taxCalculation
+        \Magento\Tax\Api\TaxCalculationInterface $taxCalculation,
+         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
     ) {
         $this->checkoutCart              = $checkoutCart;
         $this->helperData                = $helperData;
@@ -45,25 +55,26 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->wishlistRepository        = $wishlistRepository;
         $this->productRepository         = $productRepository;
         $this->taxCalculation            = $taxCalculation;
+        $this->resultJsonFactory  = $resultJsonFactory;
     }
 
-    public function _getCartInformation($addressId ,$countryId ,$setRegionId, $shipping_method , $zipcode)
+    public function _getCartInformation($addressId, $countryId, $setRegionId, $shipping_method, $zipcode)
     {
-        $shipping_amount = $this->_getShippingTotal($addressId ,$countryId ,$setRegionId, $shipping_method, $zipcode);
-        $cart = $this->checkoutCart;
+        $result         = $this->resultJsonFactory->create();
+        $shipping_amount = $this->_getShippingTotal($addressId, $countryId, $setRegionId, $shipping_method, $zipcode);
+        $cart            = $this->checkoutCart;
         if ($cart->getQuote()->getItemsCount()) {
-            //$cart->init ();
             $cart->save();
         }
         $cart->getQuote()->collectTotals()->save();
-        $cartInfo               = array();
-        $cartInfo['is_virtual'] = $cart->getIsVirtualQuote();
-        $cartInfo['cart_items'] = $this->_getCartItems();
-        $cartInfo['cart_items_count']     =  $this->cartHelper->getSummaryCount();
+        $cartInfo                         = array();
+        $cartInfo['is_virtual']           = $cart->getIsVirtualQuote();
+        $cartInfo['cart_items']           = $this->_getCartItems();
+        $cartInfo['cart_items_count']     = $this->cartHelper->getSummaryCount();
         $cartInfo['grand_total']          = number_format($cart->getQuote()->getGrandTotal(), 2, '.', '');
         $cartInfo['sub_total']            = number_format($cart->getQuote()->getSubtotal(), 2, '.', '');
         $cartInfo['allow_guest_checkout'] = $this->checkoutHelper->isAllowedGuestCheckout($this->checkoutSession->getQuote());
-        $cartInfo ['shipping_amount'] = $shipping_amount;
+        $cartInfo['shipping_amount']      = $shipping_amount;
 
         return $cartInfo;
     }
@@ -76,15 +87,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getPriceInclAndExclTax(int $productId)
     {
         $product = $this->productRepository->getById($productId);
-     
+
         if ($taxAttribute = $product->getCustomAttribute('tax_class_id')) {
             // First get base price (=price excluding tax)
             $productRateId = $taxAttribute->getValue();
-            $rate = $this->taxCalculation->getCalculatedRate($productRateId);
-     
+            $rate          = $this->taxCalculation->getCalculatedRate($productRateId);
+
             if ((int) $this->scopeConfig->getValue(
-                'tax/calculation/price_includes_tax', 
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE) === 1
+                'tax/calculation/price_includes_tax',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ) === 1
             ) {
                 // Product price in catalog is including tax.
                 $priceExcludingTax = $product->getPrice() / (1 + ($rate / 100));
@@ -92,14 +104,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 // Product price in catalog is excluding tax.
                 $priceExcludingTax = $product->getPrice();
             }
-     
+
             $priceIncludingTax = $priceExcludingTax + ($priceExcludingTax * ($rate / 100));
             return array(
                 'incl' => $priceIncludingTax,
-                'excl' => $priceExcludingTax
+                'excl' => $priceExcludingTax,
             );
         }
-     
+
         throw new LocalizedException(__('Tax Attribute not found'));
     }
 
@@ -112,14 +124,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $displayCartPriceExclTax = $this->helperData->displayCartPriceExclTax();
         $displayCartBothPrices   = $this->helperData->displayCartBothPrices();
 
-        $items           = $quote->getAllVisibleItems();
-        $baseCurrency    = $this->storeManager->getStore()->getBaseCurrencyCode();
+        $items            = $quote->getAllVisibleItems();
+        $baseCurrency     = $this->storeManager->getStore()->getBaseCurrencyCode();
         $currentCurrencys = $this->storeManager->getStore()->getCurrentCurrency()->getCode();
 
         $product_model = $this->productModel;
 
         foreach ($items as $item) {
-                $this->getPriceInclAndExclTax($item->getProduct()->getId());
+            $this->getPriceInclAndExclTax($item->getProduct()->getId());
             $product                          = $product_model->load($item->getProduct()->getId());
             $cartItemArr                      = array();
             $cartItemArr['cart_item_id']      = $item->getId();
@@ -129,12 +141,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $cartItemArr['item_title']        = strip_tags($item->getProduct()->getName());
             $cartItemArr['qty']               = $item->getQty();
             $cartItemArr['thumbnail_pic_url'] = $this->imageHelper
-                                                    ->init($product_model, 'product_page_image_small')
-                                                    ->setImageFile($product_model->getFile())
-                                                    ->resize('100', '100')
-                                                    ->getUrl();
-            $cartItemArr['custom_option']     = $this->_getCustomOptions($item);
-            $cartItemArr['item_price']        = number_format($item->getPrice(), 2, '.', '');
+                ->init($product_model, 'product_page_image_small')
+                ->setImageFile($product_model->getFile())
+                ->resize('100', '100')
+                ->getUrl();
+            $cartItemArr['custom_option'] = $this->_getCustomOptions($item);
+            $cartItemArr['item_price']    = number_format($item->getPrice(), 2, '.', '');
             array_push($cartItemsArr, $cartItemArr);
         }
 
@@ -185,63 +197,63 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->errors;
     }
 
-    public function _getShippingTotal($addressId ,$countryId ,$setRegionId, $shipping_method , $zipcode){
-        
-        $quote= $this->checkoutCart->getQuote();
-        if(isset($addressId)) {
-        $customer   = $this->customerAddress->load($addressId);
-        $countryId = $customer['country_id'];
-        $setRegionId = $customer['region_id'];
-        $regionName = $customer['region'];
-        $shippingCheck = $quote->getShippingAddress()->getData();
+    public function _getShippingTotal($addressId, $countryId, $setRegionId, $shipping_method, $zipcode)
+    {
 
-          if($shippingCheck['shipping_method'] != $shipping_method) {
-                    if (isset($setRegionId)){
-                        $quote->getShippingAddress()
-                          ->setCountryId($countryId)
-                          ->setRegionId($setRegionId)
-                          ->setPostcode($zipcode)
-                          ->setCollectShippingRates(true);
-                    } else {
-                    $quote->getShippingAddress()
-                          ->setCountryId($countryId)
-                          ->setRegion($regionName)
-                          ->setPostcode($zipcode)
-                          ->setCollectShippingRates(true);              
-                    }
-                    $quote->save();
-                    $quote->getShippingAddress()->setShippingMethod($shipping_method)->save();
-                }
-        
-                $quote->collectTotals ()->save ();
-                $amount=$quote->getShippingAddress()->getData();
-                $shipping_amount = $amount['shipping_incl_tax'];
-                return  $shipping_amount;
-            } else {  
-                $shippingCheck = $quote->getShippingAddress()->getData();
+        $quote = $this->checkoutCart->getQuote();
+        if (isset($addressId)) {
+            $customer      = $this->customerAddress->load($addressId);
+            $countryId     = $customer['country_id'];
+            $setRegionId   = $customer['region_id'];
+            $regionName    = $customer['region'];
+            $shippingCheck = $quote->getShippingAddress()->getData();
 
-                if($shippingCheck['shipping_method'] != $shipping_method) {
-                    if (isset($setRegionId)){
-                        $quote->getShippingAddress()
-                          ->setCountryId($countryId)
-                          ->setRegionId($setRegionId)
-                          ->setPostcode($zipcode)
-                          ->setCollectShippingRates(true);
-                    } else {  
+            if ($shippingCheck['shipping_method'] != $shipping_method) {
+                if (isset($setRegionId)) {
                     $quote->getShippingAddress()
-                          ->setCountryId($countryId)
-                          ->setPostcode($zipcode)
-                          ->setCollectShippingRates(true);  
-                    }
-                    $quote->save();
-                    $quote->getShippingAddress()->setShippingMethod($shipping_method)->save();
+                        ->setCountryId($countryId)
+                        ->setRegionId($setRegionId)
+                        ->setPostcode($zipcode)
+                        ->setCollectShippingRates(true);
+                } else {
+                    $quote->getShippingAddress()
+                        ->setCountryId($countryId)
+                        ->setRegion($regionName)
+                        ->setPostcode($zipcode)
+                        ->setCollectShippingRates(true);
                 }
-                $quote->collectTotals ()->save ();
-                $amount=$quote->getShippingAddress();
-                $shipping_amount = $amount['shipping_incl_tax'];
-                return $shipping_amount;
+                $quote->save();
+                $quote->getShippingAddress()->setShippingMethod($shipping_method)->save();
             }
- 
+
+            $quote->collectTotals()->save();
+            $amount          = $quote->getShippingAddress()->getData();
+            $shipping_amount = $amount['shipping_incl_tax'];
+            return $shipping_amount;
+        } else {
+            $shippingCheck = $quote->getShippingAddress()->getData();
+
+            if ($shippingCheck['shipping_method'] != $shipping_method) {
+                if (isset($setRegionId)) {
+                    $quote->getShippingAddress()
+                        ->setCountryId($countryId)
+                        ->setRegionId($setRegionId)
+                        ->setPostcode($zipcode)
+                        ->setCollectShippingRates(true);
+                } else {
+                    $quote->getShippingAddress()
+                        ->setCountryId($countryId)
+                        ->setPostcode($zipcode)
+                        ->setCollectShippingRates(true);
+                }
+                $quote->save();
+                $quote->getShippingAddress()->setShippingMethod($shipping_method)->save();
+            }
+            $quote->collectTotals()->save();
+            $amount          = $quote->getShippingAddress();
+            $shipping_amount = $amount['shipping_incl_tax'];
+            return $shipping_amount;
+        }
     }
 
     public function _getCartTotal()
@@ -288,33 +300,32 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
 
         if ($this->compareExp() > 4800) {
-            echo json_encode(array('status' => 'error', 'code' => '001'));
-            exit;
+            $result->setData(['status' => 'error', 'code' => '001']);
+            return $result;
         }
 
         if ($this->scopeConfig->getValue('magentomobileshop/secure/token') != $helper) {
-            echo json_encode(array('status' => 'error', 'code' => '002'));
-            exit;
+            $result->setData(['status' => 'error', 'code' => '002']);
+            return $result;
         }
         if (!$this->scopeConfig->getValue('magentomobileshop/key/status')) {
-            echo json_encode(array('status' => 'error', 'code' => '003'));
-            exit;
+            $result->setData(['status' => 'error', 'code' => '003']);
+            return $result;
         }
         if ($this->compareExp() > 4800 ||
             $this->scopeConfig->getValue('magentomobileshop/secure/token') != isset($helper)
             || !$this->scopeConfig->getValue('magentomobileshop/key/status') || !$helper) {
-            echo json_encode(array('status' => 'error', 'code' => '004'));
-            exit;
+            $result->setData(['status' => 'error', 'code' => '004']);
+            return $result;
         }
     }
     public function storeConfig($storeid)
     {
         if ($this->storeManager->getStore()->getStoreId() == $storeid) {
-            return $this->storeManager->getStore()->getStoreId();
-            exit;
+            $result->setData($this->storeManager->getStore()->getStoreId());
+            return $result;
         } else {
             return $storeid;
-            exit;
         }
     }
     public function viewConfig($viewid)
@@ -352,7 +363,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                         //'symbol'          => $this->currentCurrency->getCurrencySymbol(),
                     ];
                 }
-                $data_order['symbol']   =$this->currentCurrency->getCurrencySymbol();
+                $data_order['symbol']    = $this->currentCurrency->getCurrencySymbol();
                 $result                  = array();
                 $result['order_details'] = $data_order;
                 $result['order_items']   = $_orderItems;
@@ -375,59 +386,57 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     public function getSpecialPriceProduct($productId)
-        {  
-            $product = $this->productModel->load($productId);
-          //  $baseCurrency = $this->getBaseCurrencyCode();
-          //  $currentCurrency = $this->getCurrentCurrencyCode();
+    {
+        $product = $this->productModel->load($productId);
+        //  $baseCurrency = $this->getBaseCurrencyCode();
+        //  $currentCurrency = $this->getCurrentCurrencyCode();
 
+        $specialprice         = $this->getSpecialPriceByProductId($productId);
+        $final_price_with_tax = $product->getData('final_price');
 
-            $specialprice =$this->getSpecialPriceByProductId($productId);
-            $final_price_with_tax = $product->getData('final_price');
-                                
-             if($specialprice >= $final_price_with_tax):
-                return $final_price_with_tax;
-             else:
-                return $specialprice;
-             endif;
+        if ($specialprice >= $final_price_with_tax) {
+            return $final_price_with_tax;
+        } else {
+            return $specialprice;
         }
+    }
     public function getSpecialPriceByProductId($productId)
     {
-            $product = $this->productModel->load($productId);
-            $specialprice = $product->getData('special_price');
-            $specialPriceFromDate = $product->getData('special_from_date');
-            $specialPriceToDate = $product->getData('special_to_date');
-            
-            $today = time();
-         
-            if ($specialprice):
-                if($today >= strtotime( $specialPriceFromDate) && $today <= strtotime($specialPriceToDate) || $today >= strtotime( $specialPriceFromDate) && is_null($specialPriceToDate)):
-                        return $specialprice;
-                else: return '0.00'; endif;
-            else:
+        $product              = $this->productModel->load($productId);
+        $specialprice         = $product->getData('special_price');
+        $specialPriceFromDate = $product->getData('special_from_date');
+        $specialPriceToDate   = $product->getData('special_to_date');
+
+        $today = time();
+
+        if ($specialprice) {
+            if ($today >= strtotime($specialPriceFromDate) && $today <= strtotime($specialPriceToDate) || $today >= strtotime($specialPriceFromDate) && is_null($specialPriceToDate)) {
+                return $specialprice;
+            } else {
                 return '0.00';
-            endif;
+            }
+        } else {
+            return '0.00';
+        }
     }
 
-    public function check_wishlist($productId){
-
-            $customer =  $this->customerSession;
-
-            if($customer->isLoggedIn()):
-
-                $wishlist = $this->wishlistRepository->create()->loadByCustomerId($customer->getId(), true);
-                $wishListItemCollection = $wishlist->getItemCollection();
-                $wishlist_product_id = array();
-                foreach ($wishListItemCollection as $item){   
-
-                     $wishlist_product_id[]=   $item->getProductId();
-                 }
-                if(in_array($productId,  $wishlist_product_id))
-                    return true;
-                else
-                    return false; 
-                
-            else:
+    public function checkWishlist($productId)
+    {
+        $customer = $this->customerSession;
+        if ($customer->isLoggedIn()) {
+            $wishlist               = $this->wishlistRepository->create()->loadByCustomerId($customer->getId(), true);
+            $wishListItemCollection = $wishlist->getItemCollection();
+            $wishlist_product_id    = array();
+            foreach ($wishListItemCollection as $item) {
+                $wishlist_product_id[] = $item->getProductId();
+            }
+            if (in_array($productId, $wishlist_product_id)) {
+                return true;
+            } else {
                 return false;
-            endif;
+            }
+        } else {
+            return false;
         }
+    }
 }
