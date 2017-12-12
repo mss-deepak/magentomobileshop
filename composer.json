@@ -1,0 +1,8 @@
+{
+  "name": "Magento Mobile Shop M2",
+  "homepage": "https://www.magentomobileshop.com/",
+  "repositories": [
+    { "type": "vcs", "url": "https://bitbucket.org/magentomobileapp/magentomobileshopm2" }
+     ],
+  "require-all": true
+}
